@@ -1,3 +1,5 @@
+#add service account with required roles to run this cloud build
+serviceAccount: project/cicd-demo-project-481705/serviceAccounts/service-account-cicd-pipline@cicd-demo-project-481705.iam.gserviceaccount.com
 #this is cloudbuild.yaml file
 options:
   logging: CLOUD_LOGGING_ONLY
