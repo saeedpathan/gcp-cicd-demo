@@ -27,7 +27,8 @@ steps:
     - |
       gcloud container clusters get-credentials dev-cluster --zone asia-south1-a
       kubectl apply -f deployment-dev.yaml
-      kubectl rollout status deployment/app
+      kubectl rollout status deployment/app-dev
 
 images:
 - asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$SHORT_SHA
+#jsjhf
