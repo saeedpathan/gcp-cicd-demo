@@ -17,3 +17,4 @@ spec:
         image: IMAGE_NAME
         ports:
         - containerPort: 8080
+#deployment-dev.yaml ends here
