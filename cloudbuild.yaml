@@ -1,0 +1,44 @@
+steps:
+# Build Docker Image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - build
+    - '-t'
+    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA'
+    - '.'
+
+# Push Image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - push
+    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA'
+
+# Deploy to DEV
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+    - apply
+    - '-f'
+    - deployment-dev.yaml
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-a'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=dev-cluster'
+
+# Manual Approval
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - builds
+    - submit
+  waitFor: ['-']
+
+# Deploy to PROD
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+    - apply
+    - '-f'
+    - deployment-prod.yaml
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-a'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=prod-cluster'
+
+images:
+- asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA
