@@ -1,50 +1,33 @@
-#add service account with required roles to run this cloud build
-serviceAccount: project/cicd-demo-project-481705/serviceAccounts/service-account-cicd-pipline@cicd-demo-project-481705.iam.gserviceaccount.com
-#this is cloudbuild.yaml file
+# Dedicated CI/CD service account
+serviceAccount: projects/cicd-demo-project-481705/serviceAccounts/service-account-cicd-pipline@cicd-demo-project-481705.iam.gserviceaccount.com
+
 options:
   logging: CLOUD_LOGGING_ONLY
+
 steps:
-# Build Docker Image
-- name: 'gcr.io/cloud-builders/docker'
+# 1️⃣ Build Docker Image
+- name: gcr.io/cloud-builders/docker
   args:
     - build
-    - '-t'
-    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID'
-    - '.'
+    - "-t"
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID"
+    - "."
 
-# Push Image
-#add $BUILD_ID to image tag
-- name: 'gcr.io/cloud-builders/docker'
+# 2️⃣ Push Image to Artifact Registry
+- name: gcr.io/cloud-builders/docker
   args:
     - push
-    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID'
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID"
 
-# Deploy to DEV
-- name: 'gcr.io/cloud-builders/kubectl'
+# 3️⃣ Deploy to DEV GKE
+- name: gcr.io/cloud-builders/kubectl
+  entrypoint: bash
   args:
-    - apply
-    - '-f'
-    - deployment-dev.yaml
-  env:
-    - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-a'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=dev-cluster'
-
-# Manual Approval
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-    - builds
-    - submit
-  waitFor: ['-']
-
-# Deploy to PROD
-- name: 'gcr.io/cloud-builders/kubectl'
-  args:
-    - apply
-    - '-f'
-    - deployment-prod.yaml
-  env:
-    - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-a'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=prod-cluster2'
+    - -c
+    - |
+      gcloud container clusters get-credentials dev-cluster --zone asia-south1-a
+      kubectl set image deployment/app app=asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID
+      kubectl rollout status deployment/app
 
 images:
 - asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID
