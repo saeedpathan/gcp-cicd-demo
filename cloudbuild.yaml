@@ -1,19 +1,33 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: app
-  template:
-    metadata:
-      labels:
-        app: app
-    spec:
-      containers:
-      - name: app
-        image: asia-south1-docker.pkg.dev/cicd-demo-project-481705/my-docker-test-repo/app:latest
-        ports:
-        - containerPort: 8080
+# Dedicated CI/CD service account
+serviceAccount: projects/cicd-demo-project-481705/serviceAccounts/service-account-cicd-pipline@cicd-demo-project-481705.iam.gserviceaccount.com
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+# 1️⃣ Build Docker Image
+- name: gcr.io/cloud-builders/docker
+  args:
+    - build
+    - "-t"
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$SHORT_SHA"
+    - "."
+
+# 2️⃣ Push Image
+- name: gcr.io/cloud-builders/docker
+  args:
+    - push
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$SHORT_SHA"
+
+# 3️⃣ Deploy to DEV
+- name: gcr.io/cloud-builders/kubectl
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud container clusters get-credentials dev-cluster --zone asia-south1-a
+      kubectl apply -f deployment-dev.yaml
+      kubectl rollout status deployment/app
+
+images:
+- asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$SHORT_SHA
