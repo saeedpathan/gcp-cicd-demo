@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-dev-service
+spec:
+  type: LoadBalancer        # 👈 THIS creates External IP
+  selector:
+    app: app-dev            # must match deployment labels
+  ports:
+  - protocol: TCP
+    port: 80                # external port
+    targetPort: 8080        # container port
