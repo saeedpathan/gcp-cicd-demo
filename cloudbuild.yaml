@@ -4,14 +4,14 @@ steps:
   args:
     - build
     - '-t'
-    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA'
+    - 'asia-south1-docker.pkg.dev/$cicd-demo-project-481705/my-test-docker-repo/app:$SHORT_SHA'
     - '.'
 
 # Push Image
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - push
-    - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA'
+    - 'asia-south1-docker.pkg.dev/$cicd-demo-project-481705/my-test-docker-repo/app:$SHORT_SHA'
 
 # Deploy to DEV
 - name: 'gcr.io/cloud-builders/kubectl'
@@ -38,7 +38,7 @@ steps:
     - deployment-prod.yaml
   env:
     - 'CLOUDSDK_COMPUTE_ZONE=asia-south1-a'
-    - 'CLOUDSDK_CONTAINER_CLUSTER=prod-cluster'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=prod-cluster2'
 
 images:
-- asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-repo/app:$SHORT_SHA
+- asia-south1-docker.pkg.dev/$cicd-demo-project-481705/my-test-docker-repo/app:$SHORT_SHA
