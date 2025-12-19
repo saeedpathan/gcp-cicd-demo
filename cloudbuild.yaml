@@ -26,7 +26,7 @@ steps:
     - -c
     - |
       gcloud container clusters get-credentials dev-cluster --zone asia-south1-a
-      kubectl set image deployment/app app=asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID
+      kubectl set image deployment/app app=asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$BUILD_ID
       kubectl rollout status deployment/app
 
 images:
