@@ -10,14 +10,14 @@ steps:
   args:
     - build
     - "-t"
-    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID"
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$BUILD_ID"
     - "."
 
 # 2️⃣ Push Image to Artifact Registry
 - name: gcr.io/cloud-builders/docker
   args:
     - push
-    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID"
+    - "asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$BUILD_ID"
 
 # 3️⃣ Deploy to DEV GKE
 - name: gcr.io/cloud-builders/kubectl
@@ -30,4 +30,4 @@ steps:
       kubectl rollout status deployment/app
 
 images:
-- asia-south1-docker.pkg.dev/$PROJECT_ID/my-test-docker-repo/app:$BUILD_ID
+- asia-south1-docker.pkg.dev/$PROJECT_ID/my-docker-test-repo/app:$BUILD_ID
